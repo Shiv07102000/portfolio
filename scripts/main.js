@@ -92,27 +92,23 @@ function updateLanguage(lang) {
     elements.forEach(el => {
         const text = el.getAttribute(`data-${lang}`);
         if (text) {
-            if (text.includes('<')) {
-                el.innerHTML = text;
-            } else {
-                // Check if element has child elements we should preserve
-                const hasOnlyText = el.childNodes.length === 1 && el.childNodes[0].nodeType === 3;
-                const hasIconAndSpan = el.querySelector('i') && el.querySelector('span');
+            // Check if element has child elements we should preserve
+            const hasOnlyText = el.childNodes.length === 1 && el.childNodes[0].nodeType === 3;
+            const hasIconAndSpan = el.querySelector('i') && el.querySelector('span');
 
-                if (hasIconAndSpan) {
-                    // For buttons with icons
-                    const span = el.querySelector('span');
-                    if (span) span.textContent = text;
-                } else if (hasOnlyText || el.children.length === 0) {
-                    el.textContent = text;
+            if (hasIconAndSpan) {
+                // For buttons with icons
+                const span = el.querySelector('span');
+                if (span) span.textContent = text;
+            } else if (hasOnlyText || el.children.length === 0) {
+                el.textContent = text;
+            } else {
+                // For elements with mixed content, try to update text nodes
+                const textNode = Array.from(el.childNodes).find(n => n.nodeType === 3 && n.textContent.trim());
+                if (textNode) {
+                    textNode.textContent = text;
                 } else {
-                    // For elements with mixed content, try to update text nodes
-                    const textNode = Array.from(el.childNodes).find(n => n.nodeType === 3 && n.textContent.trim());
-                    if (textNode) {
-                        textNode.textContent = text;
-                    } else {
-                        el.textContent = text;
-                    }
+                    el.textContent = text;
                 }
             }
         }
